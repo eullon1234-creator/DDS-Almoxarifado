@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { jsPDF } from "jspdf";
 import { FileDown, RefreshCw, Calendar } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 // Mock data for DDS themes relevant to Warehouse/Almoxarifado
 const MOCK_THEMES = [
@@ -114,6 +114,12 @@ export default function DDSGenerator() {
 
   useEffect(() => {
     async function fetchThemes() {
+      // If Supabase is not configured, use mock data
+      if (!isSupabaseConfigured || !supabase) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const { data, error } = await supabase
           .from('themes')
