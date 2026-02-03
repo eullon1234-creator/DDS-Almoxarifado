@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { jsPDF } from "jspdf";
-import { FileDown, RefreshCw, Calendar } from 'lucide-react';
+import { FileDown, RefreshCw, Calendar, Wand2, Loader } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { generateDDSTheme } from '@/lib/deepseek';
 
 // Mock data for DDS themes relevant to Warehouse/Almoxarifado
 const MOCK_THEMES = [
@@ -111,6 +112,8 @@ export default function DDSGenerator() {
   const [currentTheme, setCurrentTheme] = useState<Theme>(MOCK_THEMES[0]);
   const [readerName, setReaderName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [generatingAI, setGeneratingAI] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchThemes() {
@@ -148,6 +151,30 @@ export default function DDSGenerator() {
   const generateNewTheme = () => {
     const randomIndex = Math.floor(Math.random() * themes.length);
     setCurrentTheme(themes[randomIndex]);
+  };
+
+  const generateAITheme = async () => {
+    setGeneratingAI(true);
+    setAiError(null);
+    
+    try {
+      const newTheme = await generateDDSTheme();
+      const aiThemeWithId: Theme = {
+        id: Math.max(...themes.map(t => t.id), 0) + 1,
+        title: newTheme.title,
+        content: newTheme.content,
+        summary: newTheme.summary
+      };
+      
+      setThemes([aiThemeWithId, ...themes]);
+      setCurrentTheme(aiThemeWithId);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao gerar tema';
+      setAiError(errorMessage);
+      console.error('Erro ao gerar tema com IA:', error);
+    } finally {
+      setGeneratingAI(false);
+    }
   };
 
   const downloadPDF = () => {
@@ -229,6 +256,24 @@ export default function DDSGenerator() {
           <RefreshCw className="mr-2 h-4 w-4" />
           Gerar Novo Tema
         </button>
+
+        <button
+          onClick={generateAITheme}
+          disabled={generatingAI}
+          className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-purple-400 disabled:cursor-not-allowed"
+        >
+          {generatingAI ? (
+            <>
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              Gerando...
+            </>
+          ) : (
+            <>
+              <Wand2 className="mr-2 h-4 w-4" />
+              Gerar com IA (Deepseek)
+            </>
+          )}
+        </button>
         
         <button
           onClick={downloadPDF}
@@ -238,6 +283,16 @@ export default function DDSGenerator() {
           Baixar PDF
         </button>
       </div>
+
+      {aiError && (
+        <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <p className="font-semibold">Erro ao gerar tema com IA:</p>
+          <p className="text-sm">{aiError}</p>
+          <p className="text-xs mt-2 text-gray-600">
+            Certifique-se de que a chave NEXT_PUBLIC_DEEPSEEK_API_KEY está configurada nas variáveis de ambiente.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
