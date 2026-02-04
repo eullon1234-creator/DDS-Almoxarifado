@@ -191,19 +191,19 @@ export default function DDSGenerator() {
   };
 
   if (loading) {
-    return <div className="text-center p-10">Carregando temas...</div>;
+    return <div className="text-center p-10 text-cyber-muted">Carregando temas...</div>;
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-3xl m-4 p-6">
-      <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold mb-2">DDS do Dia</div>
+    <div className="max-w-2xl mx-auto rounded-xl overflow-hidden md:max-w-3xl m-4 p-6 bg-cyber-surface/80 border border-cyber-border shadow-neonMix backdrop-blur">
+      <div className="uppercase tracking-[0.22em] text-xs text-cyber-cyan font-semibold mb-2">DDS do Dia</div>
       
       <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="reader">
+        <label className="block text-cyber-muted text-sm font-bold mb-2" htmlFor="reader">
           Quem vai ler hoje?
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="appearance-none rounded w-full py-2 px-3 leading-tight bg-cyber-bg/60 text-cyber-text border border-cyber-border shadow-neonCyan focus:outline-none focus:ring-2 focus:ring-cyber-cyan/40"
           id="reader"
           type="text"
           placeholder="Nome do colaborador"
@@ -212,19 +212,19 @@ export default function DDSGenerator() {
         />
       </div>
 
-      <div className="border-l-4 border-indigo-500 pl-4 mb-6">
-        <h1 className="block mt-1 text-lg leading-tight font-medium text-black">{currentTheme.title}</h1>
-        <p className="mt-2 text-gray-500">{currentTheme.content}</p>
-        <div className="mt-4 bg-gray-100 p-3 rounded">
-          <span className="font-bold text-gray-700">Resumo: </span>
-          <span className="text-gray-600">{currentTheme.summary}</span>
+      <div className="border-l-4 border-cyber-pink pl-4 mb-6">
+        <h1 className="block mt-1 text-lg leading-tight font-medium text-cyber-text">{currentTheme.title}</h1>
+        <p className="mt-2 text-cyber-muted">{currentTheme.content}</p>
+        <div className="mt-4 bg-cyber-bg/60 p-3 rounded border border-cyber-border shadow-neonPink">
+          <span className="font-bold text-cyber-text">Resumo: </span>
+          <span className="text-cyber-muted">{currentTheme.summary}</span>
         </div>
       </div>
 
       <div className="flex gap-4">
         <button
           onClick={generateNewTheme}
-          className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-cyber-text bg-cyber-bg/60 border border-cyber-border shadow-neonCyan hover:bg-cyber-bg/80 focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50"
         >
           <RefreshCw className="mr-2 h-4 w-4" />
           Gerar Novo Tema
@@ -232,7 +232,7 @@ export default function DDSGenerator() {
         
         <button
           onClick={downloadPDF}
-          className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-cyber-text bg-gradient-to-r from-cyber-purple to-cyber-pink shadow-neonMix hover:from-cyber-pink hover:to-cyber-cyan focus:outline-none focus:ring-2 focus:ring-cyber-pink/40"
         >
           <FileDown className="mr-2 h-4 w-4" />
           Baixar PDF
