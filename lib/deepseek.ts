@@ -7,9 +7,11 @@ interface DeepseekTheme {
 const DEEPSEEK_API_KEY = process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
-export async function generateDDSTheme(): Promise<DeepseekTheme> {
-  if (!DEEPSEEK_API_KEY) {
-    throw new Error('DEEPSEEK_API_KEY não configurada');
+export async function generateDDSTheme(apiKey?: string): Promise<DeepseekTheme> {
+  const finalApiKey = apiKey || (typeof window !== 'undefined' ? localStorage.getItem('cyber_dds_api_key') : null) || process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY;
+
+  if (!finalApiKey) {
+    throw new Error('Chave API não configurada. Acesse as configurações (ícone de engrenagem) para inserir sua chave.');
   }
 
   const prompt = `Gere um tema para Diálogo Diário de Segurança (DDS) relevante para um almoxarifado/warehouse.
@@ -33,7 +35,7 @@ Responda APENAS em JSON com este formato:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+        'Authorization': `Bearer ${finalApiKey}`,
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
@@ -54,13 +56,13 @@ Responda APENAS em JSON com este formato:
     }
 
     const data = await response.json();
-    
+
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       throw new Error('Resposta inválida da API Deepseek');
     }
 
     const content = data.choices[0].message.content;
-    
+
     // Parse JSON da resposta
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
@@ -68,7 +70,7 @@ Responda APENAS em JSON com este formato:
     }
 
     const theme = JSON.parse(jsonMatch[0]) as DeepseekTheme;
-    
+
     // Validação básica
     if (!theme.title || !theme.content || !theme.summary) {
       throw new Error('Resposta incompleta da API');
@@ -83,7 +85,7 @@ Responda APENAS em JSON com este formato:
 
 export async function generateMultipleDDSThemes(count: number = 5): Promise<DeepseekTheme[]> {
   const themes: DeepseekTheme[] = [];
-  
+
   for (let i = 0; i < count; i++) {
     try {
       const theme = await generateDDSTheme();
@@ -94,6 +96,6 @@ export async function generateMultipleDDSThemes(count: number = 5): Promise<Deep
       console.error(`Erro ao gerar tema ${i + 1}:`, error);
     }
   }
-  
+
   return themes;
 }
