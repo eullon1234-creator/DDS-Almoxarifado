@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 import { FileDown, RefreshCw, Calendar, Wand2, Loader, User, Terminal, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { generateDDSTheme } from '@/lib/deepseek';
+import { getSetting } from '@/lib/settings';
 
 // Mock data for DDS themes relevant to Warehouse/Almoxarifado
 const MOCK_THEMES = [
@@ -61,6 +62,8 @@ export default function DDSGenerator() {
   const [generatingAI, setGeneratingAI] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
+  const { settings: appSettings } = useSettings();
+
   useEffect(() => {
     async function fetchThemes() {
       try {
@@ -99,6 +102,12 @@ export default function DDSGenerator() {
   const generateAITheme = async () => {
     setGeneratingAI(true);
     setAiError(null);
+
+    if (!getSetting('enableAI')) {
+      setAiError('Geração por IA está desativada nas configurações.');
+      setGeneratingAI(false);
+      return;
+    }
 
     try {
       const newTheme = await generateDDSTheme();
@@ -235,6 +244,10 @@ export default function DDSGenerator() {
 
         <button
           onClick={() => {
+            if (!appSettings.enableImageGen) {
+              setAiError('Geração de imagens desativada nas configurações.');
+              return;
+            }
             const prompt = `Ilustração cyberpunk 3D hyper-realistic de ${currentTheme.title} em um ambiente de almoxarifado futurista, cores neon azul e rosa, iluminação cinematográfica, 8k.`;
             window.open(`https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000)}&nologo=true`, '_blank');
           }}
@@ -260,11 +273,15 @@ export default function DDSGenerator() {
             <span className="group-hover:text-cyber-cyan transition-colors">LIVE_FEED</span>
           </div>
           <div className="aspect-video bg-cyber-black border border-cyber-cyan/10 flex items-center justify-center relative group-hover:border-cyber-cyan/30 transition-all">
+            {appSettings.showImages ? (
             <img
               src={`https://pollinations.ai/p/${encodeURIComponent('cyberpunk safety warehouse worker ' + currentTheme.title)}?width=800&height=450&seed=42&nologo=true`}
               alt="DDS Visual Sync"
               className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity"
             />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xs text-cyber-blue">Imagens desativadas nas configurações</div>
+          )}
             <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-transparent to-transparent opacity-60"></div>
             <div className="absolute bottom-2 left-2 flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
@@ -278,11 +295,15 @@ export default function DDSGenerator() {
             <span className="group-hover:text-cyber-pink transition-colors">LIVE_FEED</span>
           </div>
           <div className="aspect-video bg-cyber-black border border-cyber-pink/10 flex items-center justify-center relative group-hover:border-cyber-pink/30 transition-all">
+          {appSettings.showImages ? (
             <img
               src={`https://pollinations.ai/p/${encodeURIComponent('cyberpunk safety sign warehouse ' + currentTheme.title)}?width=800&height=450&seed=123&nologo=true`}
               alt="DDS Safety Visual"
               className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity"
             />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xs text-cyber-blue">Imagens desativadas nas configurações</div>
+          )
             <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-transparent to-transparent opacity-60"></div>
             <div className="absolute bottom-2 left-2 flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
