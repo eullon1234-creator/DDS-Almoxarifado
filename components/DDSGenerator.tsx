@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { jsPDF } from "jspdf";
-import { FileDown, RefreshCw, Calendar, Wand2, Loader, User, Terminal, CheckCircle2 } from 'lucide-react';
+import { FileDown, RefreshCw, Calendar, Wand2, Loader, User, Terminal, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { generateDDSTheme } from '@/lib/deepseek';
 
@@ -228,18 +228,68 @@ export default function DDSGenerator() {
           ) : (
             <>
               <Wand2 className="mr-2 h-4 w-4 text-cyber-pink" />
-              IA Neural Sync
+              IA Neural Sync (Texto)
             </>
           )}
         </button>
 
         <button
+          onClick={() => {
+            const prompt = `Ilustração cyberpunk 3D hyper-realistic de ${currentTheme.title} em um ambiente de almoxarifado futurista, cores neon azul e rosa, iluminação cinematográfica, 8k.`;
+            window.open(`https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000)}&nologo=true`, '_blank');
+          }}
+          className="cyber-button flex items-center justify-center p-3 text-xs font-bold text-cyber-pink bg-cyber-pink/10 border border-cyber-pink/30 hover:bg-cyber-pink hover:text-white hover:shadow-neon-pink"
+        >
+          <ShieldCheck className="mr-2 h-4 w-4" />
+          IA Neural Sync (Foto)
+        </button>
+
+        <button
           onClick={downloadPDF}
-          className="cyber-button md:col-span-1 flex items-center justify-center p-3 text-xs font-bold text-cyber-black bg-cyber-cyan shadow-neon-cyan hover:shadow-[0_0_25px_rgba(0,243,255,0.8)]"
+          className="cyber-button md:col-span-1 lg:col-span-1 flex items-center justify-center p-3 text-xs font-bold text-cyber-black bg-cyber-cyan shadow-neon-cyan hover:shadow-[0_0_25px_rgba(0,243,255,0.8)]"
         >
           <FileDown className="mr-2 h-4 w-4" />
           Extrair PDF
         </button>
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-4 bg-cyber-black/40 border border-cyber-blue/10 rounded group cursor-crosshair overflow-hidden">
+          <div className="text-[10px] font-mono text-cyber-blue/40 mb-2 flex justify-between">
+            <span>VISUAL_LOG // RENDER_01</span>
+            <span className="group-hover:text-cyber-cyan transition-colors">LIVE_FEED</span>
+          </div>
+          <div className="aspect-video bg-cyber-black border border-cyber-cyan/10 flex items-center justify-center relative group-hover:border-cyber-cyan/30 transition-all">
+            <img
+              src={`https://pollinations.ai/p/${encodeURIComponent('cyberpunk safety warehouse worker ' + currentTheme.title)}?width=800&height=450&seed=42&nologo=true`}
+              alt="DDS Visual Sync"
+              className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-transparent to-transparent opacity-60"></div>
+            <div className="absolute bottom-2 left-2 flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-[8px] font-mono text-white/50">REC // SAFETY_CAM_04</span>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 bg-cyber-black/40 border border-cyber-blue/10 rounded group cursor-crosshair overflow-hidden">
+          <div className="text-[10px] font-mono text-cyber-blue/40 mb-2 flex justify-between">
+            <span>VISUAL_LOG // RENDER_02</span>
+            <span className="group-hover:text-cyber-pink transition-colors">LIVE_FEED</span>
+          </div>
+          <div className="aspect-video bg-cyber-black border border-cyber-pink/10 flex items-center justify-center relative group-hover:border-cyber-pink/30 transition-all">
+            <img
+              src={`https://pollinations.ai/p/${encodeURIComponent('cyberpunk safety sign warehouse ' + currentTheme.title)}?width=800&height=450&seed=123&nologo=true`}
+              alt="DDS Safety Visual"
+              className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-transparent to-transparent opacity-60"></div>
+            <div className="absolute bottom-2 left-2 flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-[8px] font-mono text-white/50">REC // SAFETY_CAM_07</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {aiError && (

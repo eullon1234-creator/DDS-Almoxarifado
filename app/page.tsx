@@ -1,4 +1,5 @@
 import DDSGenerator from '@/components/DDSGenerator';
+import ConfigPanel from '@/components/ConfigPanel';
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
           </p>
         </footer>
       </div>
+      <ConfigPanel />
     </main>
   );
 }
