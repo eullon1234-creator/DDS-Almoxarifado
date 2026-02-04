@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { jsPDF } from "jspdf";
-import { FileDown, RefreshCw, Calendar, Wand2, Loader } from 'lucide-react';
+import { FileDown, RefreshCw, Calendar, Wand2, Loader, User, Terminal, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { generateDDSTheme } from '@/lib/deepseek';
 
@@ -39,60 +39,6 @@ const MOCK_THEMES = [
     summary: "Saiba onde estão os extintores. Não bloqueie saídas. Lixo no lixo."
   },
   {
-    id: 6,
-    title: "Uso Seguro de Estiletes",
-    content: "Ao abrir caixas, corte sempre na direção oposta ao seu corpo. Mantenha a lâmina recolhida quando não estiver em uso. Nunca use estiletes com lâminas enferrujadas ou cegas, pois exigem mais força e aumentam o risco de escape.",
-    summary: "Corte para fora do corpo. Recolha a lâmina após o uso."
-  },
-  {
-    id: 7,
-    title: "Cuidado com Paletes Quebrados",
-    content: "Inspecione os paletes antes de usá-los. Paletes com tábuas soltas ou pregos expostos podem causar acidentes graves ou danificar mercadorias. Separe os danificados para reparo ou descarte e nunca suba em paletes vazios.",
-    summary: "Não use paletes danificados. Cuidado com pregos e farpas."
-  },
-  {
-    id: 8,
-    title: "Armazenamento em Altura",
-    content: "Respeite a capacidade de carga das estantes. Coloque os materiais mais pesados nas prateleiras inferiores e os mais leves nas superiores. Certifique-se de que as caixas estão estáveis e não ultrapassam o limite da prateleira.",
-    summary: "Pesados embaixo, leves em cima. Não deixe caixas instáveis."
-  },
-  {
-    id: 9,
-    title: "Atenção aos Cruzamentos",
-    content: "O almoxarifado é movimentado. Ao chegar em um cruzamento de corredores, pare, olhe e escute. Empilhadeiras têm pontos cegos e podem não te ver. Use os espelhos convexos se disponíveis e respeite a sinalização de pare.",
-    summary: "Pare, olhe e escute nos cruzamentos. Cuidado com empilhadeiras."
-  },
-  {
-    id: 10,
-    title: "Hidratação e Pausas",
-    content: "O trabalho físico no almoxarifado pode ser exaustivo, especialmente em dias quentes. Beba água regularmente, mesmo sem sede. Faça pequenas pausas para alongamento se realizar tarefas repetitivas. Um corpo hidratado e descansado foca melhor.",
-    summary: "Beba água frequentemente. Faça pausas para evitar fadiga."
-  },
-  {
-    id: 11,
-    title: "Uso do Celular",
-    content: "O uso de celular enquanto caminha ou opera máquinas tira sua atenção do ambiente. Se precisar atender uma ligação ou responder uma mensagem, pare em um local seguro, fora das rotas de tráfego. Nunca use fones de ouvido em áreas operacionais.",
-    summary: "Não ande digitando. Pare em local seguro para usar o celular."
-  },
-  {
-    id: 12,
-    title: "Descarte de Resíduos",
-    content: "Mantenha o ambiente limpo descartando fitas, plásticos e papelão nas lixeiras corretas imediatamente após o uso. Restos de embalagens no chão são armadilhas para tropeços e podem enroscar nas rodas de equipamentos.",
-    summary: "Lixo na lixeira certa. Chão limpo evita acidentes."
-  },
-  {
-    id: 13,
-    title: "Ergonomia no Computador",
-    content: "Para quem trabalha na conferência ou lançamento de notas: ajuste a altura da cadeira para que seus pés toquem o chão e seus olhos fiquem na altura do topo do monitor. Mantenha os punhos retos ao digitar. A postura correta evita lesões a longo prazo.",
-    summary: "Ajuste cadeira e monitor. Mantenha postura correta ao digitar."
-  },
-  {
-    id: 14,
-    title: "Eletricidade e Extensões",
-    content: "Não sobrecarregue tomadas e evite o uso de 'benjamins'. Não passe fios por locais de passagem onde podem ser pisados ou puxados. Se notar fios desencapados ou cheiro de queimado, não toque e avise a manutenção imediatamente.",
-    summary: "Cuidado com fios e tomadas. Não improvise instalações."
-  },
-  {
     id: 15,
     title: "Proteção dos Olhos",
     content: "No almoxarifado há poeira, farpas de madeira e fitas plásticas que podem atingir os olhos. Use óculos de proteção sempre que estiver realizando atividades que gerem partículas ou ao manusear produtos químicos de limpeza.",
@@ -125,10 +71,7 @@ export default function DDSGenerator() {
 
         if (error) {
           console.error('Erro ao buscar temas do Supabase:', error);
-          // Fallback to mock themes is already set in initial state
         } else if (data && data.length > 0) {
-          // Map Supabase data to match our Theme interface
-          // If summary is missing in DB, we can generate a simple one or use a substring
           const mappedThemes = data.map((item: any) => ({
             id: item.id,
             title: item.title,
@@ -156,7 +99,7 @@ export default function DDSGenerator() {
   const generateAITheme = async () => {
     setGeneratingAI(true);
     setAiError(null);
-    
+
     try {
       const newTheme = await generateDDSTheme();
       const aiThemeWithId: Theme = {
@@ -165,7 +108,7 @@ export default function DDSGenerator() {
         content: newTheme.content,
         summary: newTheme.summary
       };
-      
+
       setThemes([aiThemeWithId, ...themes]);
       setCurrentTheme(aiThemeWithId);
     } catch (error) {
@@ -179,120 +122,140 @@ export default function DDSGenerator() {
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-    
-    // Title
     doc.setFontSize(20);
     doc.text("DDS - Diálogo Diário de Segurança", 20, 20);
-    
-    // Date
     doc.setFontSize(12);
     doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 30);
-    
-    // Reader
     if (readerName) {
       doc.text(`Leitor: ${readerName}`, 20, 40);
     }
-
-    // Theme Title
     doc.setFontSize(16);
     doc.text(currentTheme.title, 20, 60);
-    
-    // Content (Split text to fit page)
     doc.setFontSize(12);
     const splitContent = doc.splitTextToSize(currentTheme.content, 170);
     doc.text(splitContent, 20, 80);
-    
-    // Summary
     doc.setFontSize(14);
     doc.text("Resumo:", 20, 140);
     doc.setFontSize(12);
     const summaryText = currentTheme.summary || "Sem resumo disponível.";
     const splitSummary = doc.splitTextToSize(summaryText, 170);
     doc.text(splitSummary, 20, 150);
-
-    // Footer
     doc.setFontSize(10);
     doc.text("Gerado pelo App DDS Almoxarifado", 20, 280);
-
     doc.save(`DDS_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   if (loading) {
-    return <div className="text-center p-10">Carregando temas...</div>;
+    return (
+      <div className="text-center p-20 cyber-card max-w-2xl mx-auto border-dashed animate-pulse">
+        <Loader className="mx-auto h-12 w-12 text-cyber-cyan animate-spin mb-4" />
+        <p className="text-cyber-cyan font-mono tracking-widest uppercase">Inicializando Protocolos...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-3xl m-4 p-6">
-      <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold mb-2">DDS do Dia</div>
-      
-      <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="reader">
-          Quem vai ler hoje?
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="reader"
-          type="text"
-          placeholder="Nome do colaborador"
-          value={readerName}
-          onChange={(e) => setReaderName(e.target.value)}
-        />
+    <div className="cyber-card p-8 rounded-none border-l-4 border-l-cyber-cyan">
+      <div className="flex items-center gap-2 text-cyber-cyan font-mono text-xs mb-6 opacity-70">
+        <Terminal size={14} />
+        <span className="animate-pulse">TERMINAL // LOGGED_IN // READY</span>
       </div>
 
-      <div className="border-l-4 border-indigo-500 pl-4 mb-6">
-        <h1 className="block mt-1 text-lg leading-tight font-medium text-black">{currentTheme.title}</h1>
-        <p className="mt-2 text-gray-500">{currentTheme.content}</p>
-        <div className="mt-4 bg-gray-100 p-3 rounded">
-          <span className="font-bold text-gray-700">Resumo: </span>
-          <span className="text-gray-600">{currentTheme.summary}</span>
+      <div className="mb-8 group">
+        <label className="flex items-center gap-2 text-cyber-blue text-xs font-mono uppercase tracking-widest mb-3 group-focus-within:text-cyber-cyan transition-colors" htmlFor="reader">
+          <User size={14} />
+          Operador Responsável
+        </label>
+        <div className="relative">
+          <input
+            className="w-full bg-cyber-black/50 border border-cyber-blue/30 p-3 text-cyber-cyan font-mono focus:outline-none focus:border-cyber-cyan focus:ring-1 focus:ring-cyber-cyan/30 transition-all placeholder:text-cyber-blue/20"
+            id="reader"
+            type="text"
+            placeholder="NOME DO OPERADOR"
+            value={readerName}
+            onChange={(e) => setReaderName(e.target.value)}
+          />
+          <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyber-cyan group-focus-within:w-full transition-all duration-500"></div>
         </div>
       </div>
 
-      <div className="flex gap-4">
+      <div className="mb-10 relative">
+        <div className="absolute -left-8 top-0 bottom-0 w-1 bg-cyber-pink shadow-neon-pink"></div>
+        <div className="uppercase tracking-widest text-[10px] text-cyber-pink font-bold mb-2 flex items-center gap-2">
+          <Calendar size={12} />
+          Protocolo Ativo // {new Date().toLocaleDateString('pt-BR')}
+        </div>
+        <h2 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight leading-none group">
+          <span className="text-cyber-cyan opacity-50 mr-2 group-hover:opacity-100 transition-opacity">#</span>
+          {currentTheme.title}
+        </h2>
+        <div className="p-4 bg-cyber-cyan/5 border border-cyber-cyan/10 rounded-sm">
+          <p className="text-cyber-blue/90 leading-relaxed font-light first-letter:text-3xl first-letter:font-bold first-letter:text-cyber-cyan first-letter:mr-1">
+            {currentTheme.content}
+          </p>
+        </div>
+
+        <div className="mt-6 p-4 bg-cyber-black border-l-2 border-cyber-yellow/50">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 size={16} className="text-cyber-yellow" />
+            <span className="text-cyber-yellow font-mono text-xs uppercase font-bold tracking-tighter">Diretriz Crítica</span>
+          </div>
+          <p className="text-cyber-yellow/80 text-sm font-mono italic">
+            "{currentTheme.summary}"
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <button
           onClick={generateNewTheme}
-          className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="cyber-button flex items-center justify-center p-3 text-xs font-bold text-cyber-cyan bg-cyber-cyan/10 border border-cyber-cyan/30 hover:bg-cyber-cyan hover:text-cyber-black hover:shadow-neon-cyan"
         >
           <RefreshCw className="mr-2 h-4 w-4" />
-          Gerar Novo Tema
+          Rolar Protocolo
         </button>
 
         <button
           onClick={generateAITheme}
           disabled={generatingAI}
-          className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-purple-400 disabled:cursor-not-allowed"
+          className="cyber-button flex items-center justify-center p-3 text-xs font-bold text-white bg-cyber-purple/20 border border-cyber-purple/50 hover:bg-cyber-purple hover:shadow-[0_0_15px_rgba(157,0,255,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {generatingAI ? (
             <>
               <Loader className="mr-2 h-4 w-4 animate-spin" />
-              Gerando...
+              Sincronizando...
             </>
           ) : (
             <>
-              <Wand2 className="mr-2 h-4 w-4" />
-              Gerar com IA (Deepseek)
+              <Wand2 className="mr-2 h-4 w-4 text-cyber-pink" />
+              IA Neural Sync
             </>
           )}
         </button>
-        
+
         <button
           onClick={downloadPDF}
-          className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="cyber-button md:col-span-1 flex items-center justify-center p-3 text-xs font-bold text-cyber-black bg-cyber-cyan shadow-neon-cyan hover:shadow-[0_0_25px_rgba(0,243,255,0.8)]"
         >
           <FileDown className="mr-2 h-4 w-4" />
-          Baixar PDF
+          Extrair PDF
         </button>
       </div>
 
       {aiError && (
-        <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <p className="font-semibold">Erro ao gerar tema com IA:</p>
-          <p className="text-sm">{aiError}</p>
-          <p className="text-xs mt-2 text-gray-600">
-            Certifique-se de que a chave NEXT_PUBLIC_DEEPSEEK_API_KEY está configurada nas variáveis de ambiente.
-          </p>
+        <div className="mt-8 p-4 bg-cyber-pink/10 border border-cyber-pink/50 text-cyber-pink rounded-sm animate-glitch">
+          <div className="flex items-center gap-2 mb-1">
+            <Terminal size={16} />
+            <p className="font-mono text-xs uppercase font-bold">Erro de Sincronização AI</p>
+          </div>
+          <p className="text-xs font-mono">{aiError}</p>
         </div>
       )}
+
+      <div className="mt-8 flex justify-between items-center text-[8px] font-mono text-cyber-cyan/20 uppercase tracking-[0.3em]">
+        <span>Hardware: Almoxarifado-v4.2</span>
+        <span>Status: Nominal</span>
+      </div>
     </div>
   );
 }
