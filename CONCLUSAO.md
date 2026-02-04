@@ -79,6 +79,36 @@ npm run dev
 
 ---
 
+## ⚙️ Configurações (Ativar / Desativar)
+
+- **Onde**: Abra o botão de Configurações (ícone no canto inferior direito) e desbloqueie com a chave: **Euana0192***.
+
+- **Opções disponíveis (padrões)**:
+  - **Ativar IA (Texto)** — true: permite gerar temas via IA (controle o botão "Gerar com IA").
+  - **Ativar Geração de Imagens** — true: permite gerar imagens através do fluxo de IA (botão "IA Neural Sync (Foto)").
+  - **Exibir Imagens no Painel** — true: controla se imagens geradas são exibidas nos painéis de visualização.
+  - **Logs Detalhados** — false: ativa logs adicionais no console para depuração.
+
+- **Como usar**:
+  1. Abra o painel de configurações.
+  2. Alterne os toggles desejados (Ativar/Desativar).
+  3. As alterações são salvas automaticamente em `localStorage` sob a chave `cyber_dds_settings` e aplicadas imediatamente (evento global `cyber_settings_changed`).
+
+- **Exemplo de estado salvo**:
+
+```json
+{"enableAI": true, "enableImageGen": true, "showImages": true, "verboseLogging": false}
+```
+
+- **Efeitos visíveis**:
+  - Desativar **Ativar IA** impede que a geração de temas por IA seja executada (o botão exibirá uma mensagem de erro).
+  - Desativar **Ativar Geração de Imagens** bloqueará a solicitação de imagens.
+  - Desativar **Exibir Imagens no Painel** exibirá um placeholder informando que as imagens estão desativadas.
+
+> Dica: para integração mais robusta, considere transformar esse gerenciador em um React Context para re-render automático e melhor testabilidade.
+
+---
+
 ## 📊 Estatísticas da Implementação
 
 | Item | Valor |
@@ -225,6 +255,15 @@ node test-deepseek.js
 - [ ] Testar em produção
 - [ ] Monitorar performance
 - [ ] Coletar feedback
+- [✅] Transformar gerenciador de configurações em React Context (feito)
+- [✅] Adicionar testes unitários para o Context (Vitest) — arquivo: `__tests__/SettingsContext.test.tsx`
+- [✅] Adicionar CI (GitHub Actions) para rodar testes em PR/push — workflow: `.github/workflows/ci.yml`
+
+---
+
+> Observação: Para executar os testes localmente use `npm test` (Vitest). Se o seu PowerShell bloquear scripts (política de execução), execute via WSL ou ajuste a policy com `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` ou use um terminal bash.
+
+> Nota: O workflow roda em Node.js 18.x e 20.x e executa `npm ci`, `npm run lint` (tolerante a falhas) e os testes via `npm test -- --run`. 
 
 ### Médio Prazo
 - [ ] Integrar Supabase para persistência

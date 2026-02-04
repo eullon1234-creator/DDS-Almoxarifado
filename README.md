@@ -1,6 +1,10 @@
 # App DDS Almoxarifado
 
+[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
+
 Este é um aplicativo Next.js para gerenciar Diálogos Diários de Segurança (DDS) para a equipe do almoxarifado com integração de IA (Deepseek).
+
+> Dica: substitua `<OWNER>/<REPO>` na URL do badge pelo caminho do seu repositório GitHub para que o badge mostre o status real do workflow.
 
 ## Funcionalidades
 
