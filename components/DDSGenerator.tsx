@@ -5,7 +5,11 @@ import { jsPDF } from "jspdf";
 import { FileDown, RefreshCw, Calendar, Wand2, Loader, User, Terminal, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { generateDDSTheme } from '@/lib/deepseek';
+<<<<<<< HEAD
 import { useSettings } from '@/lib/SettingsContext';
+=======
+import { getSetting } from '@/lib/settings';
+>>>>>>> da2ac16327f2cd72563be9b00b3684cfe5757120
 
 // Mock data for DDS themes relevant to Warehouse/Almoxarifado
 const MOCK_THEMES = [
@@ -103,7 +107,11 @@ export default function DDSGenerator() {
     setGeneratingAI(true);
     setAiError(null);
 
+<<<<<<< HEAD
     if (!appSettings.enableAI) {
+=======
+    if (!getSetting('enableAI')) {
+>>>>>>> da2ac16327f2cd72563be9b00b3684cfe5757120
       setAiError('Geração por IA está desativada nas configurações.');
       setGeneratingAI(false);
       return;
@@ -303,7 +311,11 @@ export default function DDSGenerator() {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xs text-cyber-blue">Imagens desativadas nas configurações</div>
+<<<<<<< HEAD
           )}
+=======
+          )
+>>>>>>> da2ac16327f2cd72563be9b00b3684cfe5757120
             <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-transparent to-transparent opacity-60"></div>
             <div className="absolute bottom-2 left-2 flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>

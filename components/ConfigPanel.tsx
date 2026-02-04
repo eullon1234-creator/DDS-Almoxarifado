@@ -16,7 +16,10 @@ export default function ConfigPanel() {
     // Configurações via Context
     const { settings, toggleSetting } = useSettings();
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> da2ac16327f2cd72563be9b00b3684cfe5757120
     // Senha padrão definida para o sistema
     const SYSTEM_PWD = "Euana0192*";
 
@@ -180,6 +183,32 @@ export default function ConfigPanel() {
                                 </ol>
                                 <div className="text-[9px] text-cyber-yellow/60 italic font-mono mt-2">
                                     * A Deepseek oferece créditos gratuitos iniciais para novos usuários.
+                                </div>
+                            </div>
+
+                            {/* Novas opções de recursos (toggle) */}
+                            <div className="p-4 bg-cyber-black/5 border border-cyber-blue/20 rounded-sm space-y-3">
+                                <h3 className="text-cyber-cyan font-bold text-[10px] uppercase tracking-widest">Recursos Avançados</h3>
+                                <div className="space-y-3">
+                                    {[
+                                        { key: 'enableAI', label: 'Ativar IA (Texto)', desc: 'Permite gerar temas via IA neural.' },
+                                        { key: 'enableImageGen', label: 'Ativar Geração de Imagens', desc: 'Permite criar imagens via IA externa.' },
+                                        { key: 'showImages', label: 'Exibir Imagens no Painel', desc: 'Mostra ou oculta imagens geradas no painel.' },
+                                        { key: 'verboseLogging', label: 'Logs Detalhados', desc: 'Ativa logs de depuração no console.' },
+                                    ].map(item => (
+                                        <div key={item.key} className="flex items-center justify-between">
+                                            <div>
+                                                <div className="text-[11px] font-bold text-white">{item.label}</div>
+                                                <div className="text-[10px] text-cyber-blue/50 font-mono">{item.desc}</div>
+                                            </div>
+                                            <label className="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" className="sr-only" checked={(settings as any)[item.key]} onChange={() => toggleSetting(item.key as any)} />
+                                                <div className={`w-10 h-6 flex items-center rounded-full p-1 transition-all ${ (settings as any)[item.key] ? 'bg-cyber-cyan' : 'bg-cyber-blue/20'}`}>
+                                                    <div className={`bg-white w-4 h-4 rounded-full transform transition-transform ${ (settings as any)[item.key] ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
