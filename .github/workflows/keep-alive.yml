@@ -1,0 +1,17 @@
+name: Manter Supabase Ativo
+on:
+  schedule:
+    # Roda todo dia à meia-noite (pode ser menos frequente, ex: semanal)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        # Faz uma requisicao simples para ler a tabela de usuarios (ou qualquer outra)
+        run: |
+          curl -X GET 'https://zlwtvinnyonfuiowyheg.supabase.co/rest/v1/users?select=*&limit=1' \
+          -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY }}"
