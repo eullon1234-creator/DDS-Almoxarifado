@@ -1,15 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { jsPDF } from "jspdf";
 import { FileDown, RefreshCw, Calendar, Wand2, Loader, User, Terminal, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { generateDDSTheme } from '@/lib/deepseek';
-<<<<<<< HEAD
 import { useSettings } from '@/lib/SettingsContext';
-=======
-import { getSetting } from '@/lib/settings';
->>>>>>> da2ac16327f2cd72563be9b00b3684cfe5757120
 
 // Mock data for DDS themes relevant to Warehouse/Almoxarifado
 const MOCK_THEMES = [
@@ -63,21 +59,24 @@ export default function DDSGenerator() {
   const [currentTheme, setCurrentTheme] = useState<Theme>(MOCK_THEMES[0]);
   const [readerName, setReaderName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [generatingAI, setGeneratingAI] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
   const { settings: appSettings } = useSettings();
+  const today = useMemo(() => new Date().toLocaleDateString('pt-BR'), []);
 
   useEffect(() => {
     async function fetchThemes() {
       try {
         const { data, error } = await supabase
           .from('themes')
-          .select('*')
+          .select('id,title,content,summary,created_at')
           .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Erro ao buscar temas do Supabase:', error);
+          setLoadError('Falha ao carregar temas do Supabase. Usando temas locais.');
         } else if (data && data.length > 0) {
           const mappedThemes = data.map((item: any) => ({
             id: item.id,
@@ -90,6 +89,7 @@ export default function DDSGenerator() {
         }
       } catch (err) {
         console.error("Erro de conexão:", err);
+        setLoadError('Erro de conexao ao carregar temas. Usando temas locais.');
       } finally {
         setLoading(false);
       }
@@ -99,6 +99,7 @@ export default function DDSGenerator() {
   }, []);
 
   const generateNewTheme = () => {
+    if (!themes.length) return;
     const randomIndex = Math.floor(Math.random() * themes.length);
     setCurrentTheme(themes[randomIndex]);
   };
@@ -107,11 +108,7 @@ export default function DDSGenerator() {
     setGeneratingAI(true);
     setAiError(null);
 
-<<<<<<< HEAD
-    if (!appSettings.enableAI) {
-=======
-    if (!getSetting('enableAI')) {
->>>>>>> da2ac16327f2cd72563be9b00b3684cfe5757120
+  if (!appSettings.enableAI) {
       setAiError('Geração por IA está desativada nas configurações.');
       setGeneratingAI(false);
       return;
@@ -119,15 +116,17 @@ export default function DDSGenerator() {
 
     try {
       const newTheme = await generateDDSTheme();
-      const aiThemeWithId: Theme = {
-        id: Math.max(...themes.map(t => t.id), 0) + 1,
-        title: newTheme.title,
-        content: newTheme.content,
-        summary: newTheme.summary
-      };
-
-      setThemes([aiThemeWithId, ...themes]);
-      setCurrentTheme(aiThemeWithId);
+      setThemes((prev) => {
+        const nextId = Math.max(0, ...prev.map(t => t.id)) + 1;
+        const aiThemeWithId: Theme = {
+          id: nextId,
+          title: newTheme.title,
+          content: newTheme.content,
+          summary: newTheme.summary
+        };
+        setCurrentTheme(aiThemeWithId);
+        return [aiThemeWithId, ...prev];
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao gerar tema';
       setAiError(errorMessage);
@@ -142,7 +141,7 @@ export default function DDSGenerator() {
     doc.setFontSize(20);
     doc.text("DDS - Diálogo Diário de Segurança", 20, 20);
     doc.setFontSize(12);
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 30);
+    doc.text(`Data: ${today}`, 20, 30);
     if (readerName) {
       doc.text(`Leitor: ${readerName}`, 20, 40);
     }
@@ -178,6 +177,12 @@ export default function DDSGenerator() {
         <span className="animate-pulse">TERMINAL // LOGGED_IN // READY</span>
       </div>
 
+      {loadError && (
+        <div className="mb-6 p-3 border border-cyber-yellow/40 bg-cyber-yellow/10 text-cyber-yellow text-[10px] font-mono uppercase">
+          {loadError}
+        </div>
+      )}
+
       <div className="mb-8 group">
         <label className="flex items-center gap-2 text-cyber-blue text-xs font-mono uppercase tracking-widest mb-3 group-focus-within:text-cyber-cyan transition-colors" htmlFor="reader">
           <User size={14} />
@@ -200,7 +205,7 @@ export default function DDSGenerator() {
         <div className="absolute -left-8 top-0 bottom-0 w-1 bg-cyber-pink shadow-neon-pink"></div>
         <div className="uppercase tracking-widest text-[10px] text-cyber-pink font-bold mb-2 flex items-center gap-2">
           <Calendar size={12} />
-          Protocolo Ativo // {new Date().toLocaleDateString('pt-BR')}
+          Protocolo Ativo // {today}
         </div>
         <h2 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight leading-none group">
           <span className="text-cyber-cyan opacity-50 mr-2 group-hover:opacity-100 transition-opacity">#</span>
@@ -234,7 +239,7 @@ export default function DDSGenerator() {
 
         <button
           onClick={generateAITheme}
-          disabled={generatingAI}
+          disabled={generatingAI || !appSettings.enableAI}
           className="cyber-button flex items-center justify-center p-3 text-xs font-bold text-white bg-cyber-purple/20 border border-cyber-purple/50 hover:bg-cyber-purple hover:shadow-[0_0_15px_rgba(157,0,255,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {generatingAI ? (
@@ -259,7 +264,8 @@ export default function DDSGenerator() {
             const prompt = `Ilustração cyberpunk 3D hyper-realistic de ${currentTheme.title} em um ambiente de almoxarifado futurista, cores neon azul e rosa, iluminação cinematográfica, 8k.`;
             window.open(`https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000)}&nologo=true`, '_blank');
           }}
-          className="cyber-button flex items-center justify-center p-3 text-xs font-bold text-cyber-pink bg-cyber-pink/10 border border-cyber-pink/30 hover:bg-cyber-pink hover:text-white hover:shadow-neon-pink"
+          disabled={!appSettings.enableImageGen}
+          className="cyber-button flex items-center justify-center p-3 text-xs font-bold text-cyber-pink bg-cyber-pink/10 border border-cyber-pink/30 hover:bg-cyber-pink hover:text-white hover:shadow-neon-pink disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ShieldCheck className="mr-2 h-4 w-4" />
           IA Neural Sync (Foto)
@@ -286,6 +292,8 @@ export default function DDSGenerator() {
               src={`https://pollinations.ai/p/${encodeURIComponent('cyberpunk safety warehouse worker ' + currentTheme.title)}?width=800&height=450&seed=42&nologo=true`}
               alt="DDS Visual Sync"
               className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity"
+              loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xs text-cyber-blue">Imagens desativadas nas configurações</div>
@@ -308,14 +316,12 @@ export default function DDSGenerator() {
               src={`https://pollinations.ai/p/${encodeURIComponent('cyberpunk safety sign warehouse ' + currentTheme.title)}?width=800&height=450&seed=123&nologo=true`}
               alt="DDS Safety Visual"
               className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity"
+              loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xs text-cyber-blue">Imagens desativadas nas configurações</div>
-<<<<<<< HEAD
           )}
-=======
-          )
->>>>>>> da2ac16327f2cd72563be9b00b3684cfe5757120
             <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-transparent to-transparent opacity-60"></div>
             <div className="absolute bottom-2 left-2 flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>

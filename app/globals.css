@@ -16,6 +16,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
+  font-family: var(--font-display), system-ui, sans-serif;
   background: linear-gradient(
       to bottom,
       rgb(var(--background-start-rgb)),
@@ -24,6 +25,10 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 body::before {

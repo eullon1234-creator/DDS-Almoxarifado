@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Oxanium, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SettingsProvider } from '@/lib/SettingsContext';
 
-const inter = Inter({ subsets: ["latin"] });
+const oxanium = Oxanium({ subsets: ["latin"], variable: "--font-display" });
+const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "DDS Almoxarifado",
@@ -17,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={inter.className}>
+      <body className={`${oxanium.variable} ${jetbrains.variable}`}>
         <SettingsProvider>{children}</SettingsProvider>
       </body>
     </html>

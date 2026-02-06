@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Settings = {
+export type Settings = {
   enableAI: boolean;
   enableImageGen: boolean;
   showImages: boolean;
