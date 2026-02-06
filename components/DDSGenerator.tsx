@@ -239,8 +239,9 @@ export default function DDSGenerator() {
 
         <button
           onClick={generateAITheme}
-          disabled={generatingAI || !appSettings.enableAI}
-          className="cyber-button flex items-center justify-center p-3 text-xs font-bold text-white bg-cyber-purple/20 border border-cyber-purple/50 hover:bg-cyber-purple hover:shadow-[0_0_15px_rgba(157,0,255,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={generatingAI}
+          aria-disabled={!appSettings.enableAI}
+          className={`cyber-button flex items-center justify-center p-3 text-xs font-bold text-white bg-cyber-purple/20 border border-cyber-purple/50 hover:bg-cyber-purple hover:shadow-[0_0_15px_rgba(157,0,255,0.5)] disabled:opacity-50 disabled:cursor-not-allowed ${appSettings.enableAI ? '' : 'opacity-50 cursor-not-allowed'}`}
         >
           {generatingAI ? (
             <>
